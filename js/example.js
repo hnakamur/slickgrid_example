@@ -234,8 +234,7 @@ $(function () {
   ];
 
   var options = {
-    editable: true,
-    autoEdit: false
+    editable: true
   };
 
   var grid = new Slick.Grid("#myGrid", data, columns, options);
