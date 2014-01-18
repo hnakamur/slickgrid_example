@@ -261,6 +261,7 @@ $(function () {
   var dataView = new Slick.Data.DataView();
   var grid = new Slick.Grid("#myGrid", dataView, columns, options);
   grid.init();
+  grid.setSelectionModel(new Slick.RowSelectionModel());
 
   grid.onSort.subscribe(function (e, args) {
     var cols = args.sortCols;
