@@ -257,12 +257,14 @@ $(function () {
   var options = {
     editable: true,
     autoEdit: false,
-    multiColumnSort: true
+    multiColumnSort: true,
+    showHeaderRow: true,
+    headerRowHeight: 30,
+    explicitInitialization: true
   };
 
   var dataView = new Slick.Data.DataView();
   var grid = new Slick.Grid("#myGrid", dataView, columns, options);
-  grid.init();
   grid.setSelectionModel(new Slick.RowSelectionModel());
 
   grid.onSort.subscribe(function (e, args) {
@@ -324,6 +326,41 @@ $(function () {
     }
   });
 
+  var columnFilters = {};
+  function filter(item) {
+    for (var columnId in columnFilters) {
+      if (columnId !== undefined && columnFilters[columnId] !== "") {
+        var c = grid.getColumns()[grid.getColumnIndex(columnId)];
+        var val = item[c.field];
+        if (val === undefined || val.indexOf(columnFilters[columnId]) === -1) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  $(grid.getHeaderRow()).delegate(":input", "change keyup", function (e) {
+    var columnId = $(this).data("columnId");
+    if (columnId != null) {
+      columnFilters[columnId] = $.trim($(this).val());
+      dataView.refresh();
+    }
+  });
+
+  grid.onHeaderRowCellRendered.subscribe(function (e, args) {
+    if (args.column.id === "id") return;
+    var cell = $(args.node);
+    cell.empty();
+    $(document.createElement("input"))
+      .attr("type", "text")
+      .data("columnId", args.column.id)
+      .val(columnFilters[args.column.id])
+      .appendTo(cell);
+  });
+
+  grid.init();
+
   dataView.onRowCountChanged.subscribe(function (e, args) {
     grid.updateRowCount();
     grid.render();
@@ -336,5 +373,6 @@ $(function () {
 
   dataView.beginUpdate();
   dataView.setItems(data, "cid");
+  dataView.setFilter(filter);
   dataView.endUpdate();
 });
