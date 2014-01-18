@@ -227,4 +227,19 @@ input.editor-checkbox {
   border: 0;
 }
 
+#contextMenu {
+  position: absolute;
+  display: none;
 
+  background: #e1efc7;
+  border: 1px solid gray;
+  padding: 2px;
+  min-width: 100px;
+  -moz-box-shadow: 2px 2px 2px silver;
+  -webkit-box-shadow: 2px 2px 2px silver;
+  z-index: 99999;
+}
+
+#contextMenu li:hover {
+  background-color: white;
+}

@@ -252,9 +252,11 @@ $(function () {
       readingStatus: "読書中"
     }
   ];
+  var nextCid = data.length + 1;
 
   var options = {
     editable: true,
+    autoEdit: false,
     multiColumnSort: true
   };
 
@@ -278,6 +280,48 @@ $(function () {
       }
       return 0;
     });
+  });
+
+  grid.onContextMenu.subscribe(function (e) {
+    e.preventDefault();
+    var cell = grid.getCellFromEvent(e);
+    $("#contextMenu")
+        .data("row", cell.row)
+        .css("top", e.pageY)
+        .css("left", e.pageX)
+        .show();
+
+    $("body").one("click", function () {
+      $("#contextMenu").hide();
+    });
+  });
+
+  $("#contextMenu").click(function (e) {
+    if (!$(e.target).is("li")) {
+      return;
+    }
+    if (!grid.getEditorLock().commitCurrentEdit()) {
+      return;
+    }
+    var menu = $(e.target).attr("data");
+    if (menu === "delete") {
+      dataView.beginUpdate();
+      var rows = grid.getSelectedRows();
+      var cids = $.map(rows, function (row, i) {
+        return data[row].cid;
+      });
+      $.each(cids, function (i, cid) {
+        dataView.deleteItem(cid);
+      });
+      dataView.endUpdate();
+      grid.setSelectedRows([]);
+    } else if (menu === "add") {
+      var count = grid.getSelectedRows().length;
+      var row = $(this).data("row") + 1;
+      for (var i = 0; i < count; i++) {
+        dataView.insertItem(row + i, {cid: nextCid++});
+      }
+    }
   });
 
   dataView.onRowCountChanged.subscribe(function (e, args) {
