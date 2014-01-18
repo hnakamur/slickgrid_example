@@ -13,6 +13,7 @@ $(function () {
 
   var data = [
     {
+      cid: 1,
       id: 1,
       title: "パーフェクトRuby",
       authors: "Rubyサポーターズ, すがわら まさのり, 寺田 玄太郎, 三村 益隆, 近藤 宇智朗, 橋立 友宏, 関口 亮一",
@@ -24,6 +25,7 @@ $(function () {
       readingStatus: "読書中"
     },
     {
+      cid: 2,
       id: 2,
       title: "Sphinxをはじめよう",
       authors: "清水川貴之, 小宮健, 山田剛, 若山史郎",
@@ -35,6 +37,7 @@ $(function () {
       readingStatus: "読了"
     },
     {
+      cid: 3,
       id: 3,
       title: "Programming in Lua, Third Edition",
       authors: "Roberto Ierusalimschy",
@@ -46,6 +49,7 @@ $(function () {
       readingStatus: "読了"
     },
     {
+      cid: 4,
       id: 4,
       title: "Programming in Lua, Second Edition",
       authors: "Roberto Ierusalimschy",
@@ -57,6 +61,7 @@ $(function () {
       readingStatus: "読了"
     },
     {
+      cid: 5,
       id: 5,
       title: "Programming Erlang: Software for a Concurrent World",
       authors: "Joe Armstrong",
@@ -68,6 +73,7 @@ $(function () {
       readingStatus: "読了"
     },
     {
+      cid: 6,
       id: 6,
       title: "Erlang Programming",
       authors: "Francesco Cesarini, Simon Thompson",
@@ -79,6 +85,7 @@ $(function () {
       readingStatus: "読了"
     },
     {
+      cid: 7,
       id: 7,
       title: "Agile Web Development with Rails 4",
       authors: "Sam Ruby",
@@ -90,6 +97,7 @@ $(function () {
       readingStatus: "読了"
     },
     {
+      cid: 8,
       id: 8,
       title: "入門Chef Solo - Infrastructure as Code",
       authors: "伊藤直也",
@@ -101,6 +109,7 @@ $(function () {
       readingStatus: "読了"
     },
     {
+      cid: 9,
       id: 9,
       title: "実践Vim",
       authors: "Drew Neil, 新丈径(翻訳)",
@@ -112,6 +121,7 @@ $(function () {
       readingStatus: "読了"
     },
     {
+      cid: 10,
       id: 10,
       title: "ガベージコレクションのアルゴリズムと実装",
       authors: "中村 成洋, 相川 光, 竹内 郁雄(監修)",
@@ -123,6 +133,7 @@ $(function () {
       readingStatus: "読書中"
     },
     {
+      cid: 11,
       id: 11,
       title: "エキスパートObjective-Cプログラミング -iOS/OS Xのメモリ管理とマルチスレッド",
       authors: "坂本一樹",
@@ -134,6 +145,7 @@ $(function () {
       readingStatus: "読了"
     },
     {
+      cid: 12,
       id: 12,
       title: "Effective Android",
       authors: "TechBooster",
@@ -145,6 +157,7 @@ $(function () {
       readingStatus: "読了"
     },
     {
+      cid: 13,
       id: 13,
       title: "上を目指すプログラマーのためのiPhoneアプリ開発テクニック iOS 7編",
       authors: "加藤 寛人 (著), 西方 夏子 (著), 藤川 宏之 (著), 鈴木 晃 (著), 高丘 知央 (著), 丸山 弘詩 (編集)",
@@ -156,6 +169,7 @@ $(function () {
       readingStatus: "読書中"
     },
     {
+      cid: 14,
       id: 14,
       title: "詳解 Objective-C 2.0 第3版",
       authors: "荻原 剛志",
@@ -167,6 +181,7 @@ $(function () {
       readingStatus: "読了"
     },
     {
+      cid: 15,
       id: 15,
       title: "iPhoneアプリ開発エキスパートガイド iOS 6対応",
       authors: "加藤 寛人 (著), 藤川 宏之 (著), 高丘 知央 (著), 西方 夏子 (著), 吉田 悠一 (著), 関川 雄介 (著), 丸山 弘詩 (編集)",
@@ -178,6 +193,7 @@ $(function () {
       readingStatus: "読了"
     },
     {
+      cid: 16,
       id: 16,
       title: "iPhone/iPad グラフィックスプログラミング",
       authors: "STUDIO SHIN (著)",
@@ -189,6 +205,7 @@ $(function () {
       readingStatus: "読了"
     },
     {
+      cid: 17,
       id: 17,
       title: "iOS Core Frameworksテクニカルガイド",
       authors: "Shawn Welch (著), 柴田 文彦 (翻訳)",
@@ -200,6 +217,7 @@ $(function () {
       readingStatus: "読了"
     },
     {
+      cid: 18,
       id: 18,
       title: "iOS 7 App Development Essentials",
       authors: "Neil Smyth",
@@ -211,6 +229,7 @@ $(function () {
       readingStatus: "読了"
     },
     {
+      cid: 19,
       id: 19,
       title: "The Nature of Code",
       authors: "Daniel Shiffman",
@@ -222,6 +241,7 @@ $(function () {
       readingStatus: "読了"
     },
     {
+      cid: 20,
       id: 20,
       title: "Working With Unix Processes",
       authors: "Jesse Storimer",
@@ -238,11 +258,14 @@ $(function () {
     multiColumnSort: true
   };
 
-  var grid = new Slick.Grid("#myGrid", data, columns, options);
-  grid.onSort.subscribe(function(e, args) {
+  var dataView = new Slick.Data.DataView();
+  var grid = new Slick.Grid("#myGrid", dataView, columns, options);
+  grid.init();
+
+  grid.onSort.subscribe(function (e, args) {
     var cols = args.sortCols;
 
-    data.sort(function (dataRow1, dataRow2) {
+    dataView.sort(function (dataRow1, dataRow2) {
       for (var i = 0, l = cols.length; i < l; i++) {
         var field = cols[i].sortCol.field;
         var sign = cols[i].sortAsc ? 1 : -1;
@@ -254,7 +277,19 @@ $(function () {
       }
       return 0;
     });
-    grid.invalidate();
+  });
+
+  dataView.onRowCountChanged.subscribe(function (e, args) {
+    grid.updateRowCount();
     grid.render();
   });
+
+  dataView.onRowsChanged.subscribe(function (e, args) {
+    grid.invalidateRows(args.rows);
+    grid.render();
+  });
+
+  dataView.beginUpdate();
+  dataView.setItems(data, "cid");
+  dataView.endUpdate();
 });
