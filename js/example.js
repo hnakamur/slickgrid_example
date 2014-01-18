@@ -340,7 +340,7 @@ $(function () {
     return true;
   }
 
-  $(grid.getHeaderRow()).delegate(":input", "change keyup", function (e) {
+  $(grid.getHeaderRow()).delegate(":input", "change", function (e) {
     var columnId = $(this).data("columnId");
     if (columnId != null) {
       columnFilters[columnId] = $.trim($(this).val());
