@@ -1,14 +1,14 @@
 $(function () {
   var columns = [
-    {id: "id", name: "ID", field: "id", minWidth: 24, width: 24, editor: Slick.Editors.Text},
-    {id: "title", name: "書名", field: "title", width: 200, editor: Slick.Editors.Text},
-    {id: "authors", name: "著者", field: "authors", width: 160, editor: Slick.Editors.Text},
-    {id: "publisher", name: "出版社", field: "publisher", editor: Slick.Editors.Text},
-    {id: "published-on", name: "出版日", field: "publishedOn", width: 70, editor: Slick.Editors.Text},
-    {id: "book-type", name: "書籍種別", field: "bookType", width: 40, editor: Slick.Editors.Text},
-    {id: "book-info-url", name: "書籍情報URL", field: "bookInfoURL", editor: Slick.Editors.Text},
-    {id: "purchase-url", name: "購入URL", field: "purchaseURL", editor: Slick.Editors.Text},
-    {id: "reading-status", name: "読書状態", field: "readingStatus", width: 46, editor: Slick.Editors.Text}
+    {id: "id", name: "ID", field: "id", width: 40, sortable: true, editor: Slick.Editors.Text},
+    {id: "title", name: "書名", field: "title", width: 200, sortable: true, editor: Slick.Editors.Text},
+    {id: "authors", name: "著者", field: "authors", width: 160, sortable: true, editor: Slick.Editors.Text},
+    {id: "publisher", name: "出版社", field: "publisher", sortable: true, editor: Slick.Editors.Text},
+    {id: "published-on", name: "出版日", field: "publishedOn", width: 70, sortable: true, editor: Slick.Editors.Text},
+    {id: "book-type", name: "書籍種別", field: "bookType", width: 70, sortable: true, editor: Slick.Editors.Text},
+    {id: "book-info-url", name: "書籍情報URL", field: "bookInfoURL", width: 90, sortable: true, editor: Slick.Editors.Text},
+    {id: "purchase-url", name: "購入URL", field: "purchaseURL", sortable: true, editor: Slick.Editors.Text},
+    {id: "reading-status", name: "読書状態", field: "readingStatus", width: 70, sortable: true, editor: Slick.Editors.Text}
   ];
 
   var data = [
@@ -238,4 +238,22 @@ $(function () {
   };
 
   var grid = new Slick.Grid("#myGrid", data, columns, options);
+  grid.onSort.subscribe(function(e, args) {
+    var cols = [args];
+
+    data.sort(function (dataRow1, dataRow2) {
+      for (var i = 0, l = cols.length; i < l; i++) {
+        var field = cols[i].sortCol.field;
+        var sign = cols[i].sortAsc ? 1 : -1;
+        var value1 = dataRow1[field], value2 = dataRow2[field];
+        var result = (value1 == value2 ? 0 : (value1 > value2 ? 1 : -1)) * sign;
+        if (result != 0) {
+          return result;
+        }
+      }
+      return 0;
+    });
+    grid.invalidate();
+    grid.render();
+  });
 });
