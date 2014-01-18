@@ -234,12 +234,13 @@ $(function () {
   ];
 
   var options = {
-    editable: true
+    editable: true,
+    multiColumnSort: true
   };
 
   var grid = new Slick.Grid("#myGrid", data, columns, options);
   grid.onSort.subscribe(function(e, args) {
-    var cols = [args];
+    var cols = args.sortCols;
 
     data.sort(function (dataRow1, dataRow2) {
       for (var i = 0, l = cols.length; i < l; i++) {
