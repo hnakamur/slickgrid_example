@@ -11,7 +11,7 @@ $(function () {
     {id: "reading-status", name: "読書状態", field: "readingStatus", width: 70, sortable: true, editor: Slick.Editors.Text}
   ];
 
-  var data = [
+  var leftData = [
     {
       cid: 1,
       id: 1,
@@ -119,7 +119,9 @@ $(function () {
       bookInfoURL: "http://www.amazon.co.jp/dp/4048916599",
       purchaseURL: "http://tatsu-zine.com/books/practical-vim",
       readingStatus: "読了"
-    },
+    }
+  ];
+  var rightData = [
     {
       cid: 10,
       id: 10,
@@ -252,7 +254,7 @@ $(function () {
       readingStatus: "読書中"
     }
   ];
-  var nextCid = data.length + 1;
+  var nextCid = leftData.length + rightData.length + 1;
 
   var options = {
     editable: true,
@@ -263,116 +265,124 @@ $(function () {
     explicitInitialization: true
   };
 
-  var dataView = new Slick.Data.DataView();
-  var grid = new Slick.Grid("#myGrid", dataView, columns, options);
-  grid.setSelectionModel(new Slick.RowSelectionModel());
+  var setupGrid = function(gridID, data) {
+    var dataView = new Slick.Data.DataView();
+    var grid = new Slick.Grid(gridID, dataView, columns, options);
+    grid.setSelectionModel(new Slick.RowSelectionModel());
 
-  grid.onSort.subscribe(function (e, args) {
-    var cols = args.sortCols;
+    grid.onSort.subscribe(function (e, args) {
+      var cols = args.sortCols;
 
-    dataView.sort(function (dataRow1, dataRow2) {
-      for (var i = 0, l = cols.length; i < l; i++) {
-        var field = cols[i].sortCol.field;
-        var sign = cols[i].sortAsc ? 1 : -1;
-        var value1 = dataRow1[field], value2 = dataRow2[field];
-        var result = (value1 == value2 ? 0 : (value1 > value2 ? 1 : -1)) * sign;
-        if (result != 0) {
-          return result;
+      dataView.sort(function (dataRow1, dataRow2) {
+        for (var i = 0, l = cols.length; i < l; i++) {
+          var field = cols[i].sortCol.field;
+          var sign = cols[i].sortAsc ? 1 : -1;
+          var value1 = dataRow1[field], value2 = dataRow2[field];
+          var result = (value1 == value2 ? 0 : (value1 > value2 ? 1 : -1)) * sign;
+          if (result != 0) {
+            return result;
+          }
+        }
+        return 0;
+      });
+    });
+
+    var columnFilters = {};
+    function filter(item) {
+      for (var columnId in columnFilters) {
+        if (columnId !== undefined && columnFilters[columnId] !== "") {
+          var c = grid.getColumns()[grid.getColumnIndex(columnId)];
+          var val = item[c.field];
+          if (val === undefined || val.indexOf(columnFilters[columnId]) === -1) {
+            return false;
+          }
         }
       }
-      return 0;
-    });
-  });
-
-  grid.onContextMenu.subscribe(function (e) {
-    e.preventDefault();
-    var cell = grid.getCellFromEvent(e);
-    $("#contextMenu")
-        .data("row", cell.row)
-        .css("top", e.pageY)
-        .css("left", e.pageX)
-        .show();
-
-    $("body").one("click", function () {
-      $("#contextMenu").hide();
-    });
-  });
-
-  $("#contextMenu").click(function (e) {
-    if (!$(e.target).is("li")) {
-      return;
+      return true;
     }
-    if (!grid.getEditorLock().commitCurrentEdit()) {
-      return;
-    }
-    var menu = $(e.target).attr("data");
-    if (menu === "delete") {
-      dataView.beginUpdate();
-      var rows = grid.getSelectedRows();
-      var cids = $.map(rows, function (row, i) {
-        return data[row].cid;
-      });
-      $.each(cids, function (i, cid) {
-        dataView.deleteItem(cid);
-      });
-      dataView.endUpdate();
-      grid.setSelectedRows([]);
-    } else if (menu === "add") {
-      var count = grid.getSelectedRows().length;
-      var row = $(this).data("row") + 1;
-      for (var i = 0; i < count; i++) {
-        dataView.insertItem(row + i, {cid: nextCid++});
+
+    $(grid.getHeaderRow()).delegate(":input", "change", function (e) {
+      var columnId = $(this).data("columnId");
+      if (columnId != null) {
+        columnFilters[columnId] = $.trim($(this).val());
+        dataView.refresh();
       }
-    }
+    });
+
+    grid.onHeaderRowCellRendered.subscribe(function (e, args) {
+      if (args.column.id === "id") return;
+      var cell = $(args.node);
+      cell.empty();
+      $(document.createElement("input"))
+        .attr("type", "text")
+        .data("columnId", args.column.id)
+        .val(columnFilters[args.column.id])
+        .appendTo(cell);
+    });
+
+    grid.init();
+
+    dataView.onRowCountChanged.subscribe(function (e, args) {
+      grid.updateRowCount();
+      grid.render();
+    });
+
+    dataView.onRowsChanged.subscribe(function (e, args) {
+      grid.invalidateRows(args.rows);
+      grid.render();
+    });
+
+    dataView.beginUpdate();
+    dataView.setItems(data, "cid");
+    dataView.setFilter(filter);
+    dataView.endUpdate();
+
+    return grid;
+  };
+
+  var leftGrid = setupGrid("#leftGrid", leftData);
+  var rightGrid = setupGrid("#rightGrid", rightData);
+
+  $('.split-pane').splitPane();
+
+  var moveSelectedBooks = function (srcGrid, dstGrid) {
+    var srcDataView = srcGrid.getData(),
+        dstDataView = dstGrid.getData();
+
+    var selectedRows = srcGrid.getSelectedRows();
+    if (!selectedRows || selectedRows.length === 0)
+      return;
+    var selectedItems = $.map(selectedRows, function (row, i) {
+      return srcDataView.getItem(row);
+    });
+    var selectedCids = $.map(selectedItems, function (item, i) {
+      return item.cid;
+    });
+
+    var dstCount = dstDataView.getLength();
+    var dstSelectedRows = [];
+    dstDataView.beginUpdate();
+    $.each(selectedItems, function (i, item) {
+      dstDataView.addItem(item);
+      dstSelectedRows.push(dstCount + i);
+    });
+    dstDataView.endUpdate();
+    dstGrid.getSelectionModel().setSelectedRows(dstSelectedRows);
+    dstGrid.scrollRowIntoView(dstDataView.getLength() - 1);
+
+    srcDataView.beginUpdate();
+    $.each(selectedCids, function (i, cid) {
+      srcDataView.deleteItem(cid);
+    });
+    srcDataView.endUpdate();
+    srcGrid.setSelectedRows([]);
+  };
+
+  $('#addBooksToGroup').click(function (e) {
+    moveSelectedBooks(rightGrid, leftGrid);
   });
 
-  var columnFilters = {};
-  function filter(item) {
-    for (var columnId in columnFilters) {
-      if (columnId !== undefined && columnFilters[columnId] !== "") {
-        var c = grid.getColumns()[grid.getColumnIndex(columnId)];
-        var val = item[c.field];
-        if (val === undefined || val.indexOf(columnFilters[columnId]) === -1) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-
-  $(grid.getHeaderRow()).delegate(":input", "change", function (e) {
-    var columnId = $(this).data("columnId");
-    if (columnId != null) {
-      columnFilters[columnId] = $.trim($(this).val());
-      dataView.refresh();
-    }
+  $('#removeBooksFromGroup').click(function (e) {
+    moveSelectedBooks(leftGrid, rightGrid);
   });
-
-  grid.onHeaderRowCellRendered.subscribe(function (e, args) {
-    if (args.column.id === "id") return;
-    var cell = $(args.node);
-    cell.empty();
-    $(document.createElement("input"))
-      .attr("type", "text")
-      .data("columnId", args.column.id)
-      .val(columnFilters[args.column.id])
-      .appendTo(cell);
-  });
-
-  grid.init();
-
-  dataView.onRowCountChanged.subscribe(function (e, args) {
-    grid.updateRowCount();
-    grid.render();
-  });
-
-  dataView.onRowsChanged.subscribe(function (e, args) {
-    grid.invalidateRows(args.rows);
-    grid.render();
-  });
-
-  dataView.beginUpdate();
-  dataView.setItems(data, "cid");
-  dataView.setFilter(filter);
-  dataView.endUpdate();
 });

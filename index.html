@@ -6,14 +6,22 @@
 <link rel="stylesheet" href="css/slick.grid.css"/>
 <link rel="stylesheet" href="css/ui-lightness/jquery-ui-1.10.3.custom.css"/>
 <link rel="stylesheet" href="css/examples.css"/>
+<link rel="stylesheet" href="css/jquery.split-pane.css"/>
 </head>
 <body>
-<div id="myGrid" style="width:800px;height:400px;"></div>
-<ul id="contextMenu">
-<li data="add">本を追加</li>
-<li data="delete">本を削除</li>
-</ul>
-
+<div class="split-pane vertical-percent" style="width:800px;height:380px;">
+<div class="split-pane-component" id="leftPane">
+<h3>グループ</h3>
+<button id="removeBooksFromGroup">選択行をグループから削除</button>
+<div id="leftGrid" style="width:800px;height:300px;"></div>
+</div>
+<div class="split-pane-divider" id="splitBar"></div>
+<div class="split-pane-component" id="rightPane">
+<h3>追加対象</h3>
+<button id="addBooksToGroup">選択行をグループに追加</button>
+<div id="rightGrid" style="width:800px;height:300px;"></div>
+</div>
+</div>
 
 <script src="js/jquery-1.10.2.js"></script>
 <script src="js/jquery-ui-1.10.3.custom.js"></script>
@@ -24,6 +32,8 @@
 <script src="js/slick.editors.js"></script>
 <script src="js/slick.dataview.js"></script>
 <script src="js/plugins/slick.rowselectionmodel.js"></script>
+
+<script src="js/jquery.split-pane.js"></script>
 
 <script src="js/example.js"></script>
 </body>
