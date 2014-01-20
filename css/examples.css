@@ -246,18 +246,3 @@ input.editor-checkbox {
 #leftGrid #rightGrid {
   display: inline-block;
 }
-
-#leftPane {
-  right: 50%;
-  margin-right: 5px;
-}
-
-#splitBar {
-  right: 50%;
-  width: 5px;
-  background-color: #ccc;
-}
-
-#rightPane {
-  width: 50%;
-}

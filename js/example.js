@@ -343,7 +343,11 @@ $(function () {
   var leftGrid = setupGrid("#leftGrid", leftData);
   var rightGrid = setupGrid("#rightGrid", rightData);
 
-  $('.split-pane').splitPane();
+  $('#paneContainer').split({
+    orientation: 'vertical',
+    limit: 10,
+    position: '50%' // if there is no percentage it interpret it as pixels
+  });
 
   var moveSelectedBooks = function (srcGrid, dstGrid) {
     var srcDataView = srcGrid.getData(),
