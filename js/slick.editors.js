@@ -160,7 +160,7 @@
     var datePickerDefaultOptions = {
       showOn: "button",
       buttonImageOnly: true,
-      buttonImage: "../images/calendar.gif"
+      buttonImage: "images/calendar.gif"
     };
     var datePickerFixedOptions = {
       beforeShow: function () {
