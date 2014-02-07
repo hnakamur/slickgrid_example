@@ -46,9 +46,7 @@
 <script src="js/jquery.event.drag-2.2.js"></script>
 
 <script src="js/slick.core.js"></script>
-<script src="js/plugins/slick.cellrangedecorator.js"></script>
-<script src="js/plugins/slick.cellrangeselector.js"></script>
-<script src="js/plugins/slick.cellselectionmodel.js"></script>
+<script src="js/plugins/slick.rangeselectionmodel.js"></script>
 <script src="js/slick.formatters.js"></script>
 <script src="js/slick.editors.js"></script>
 <script src="js/slick.grid.js"></script>
@@ -96,7 +94,7 @@
 
     grid = new Slick.Grid("#myGrid", data, columns, options);
 
-    grid.setSelectionModel(new Slick.CellSelectionModel());
+    grid.setSelectionModel(new Slick.RangeSelectionModel());
 
     grid.onAddNewRow.subscribe(function (e, args) {
       var item = args.item;

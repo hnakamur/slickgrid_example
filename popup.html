@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>jQuery UI popup example</title>
+<link rel="stylesheet" href="css/ui-lightness/jquery-ui-1.10.3.custom.css"/>
+<style>
+#columnsMenu {
+  width: 100px;
+  margin: 10px;
+  display: none;
+  position: absolute;
+  background-color: #eee;
+}
+</style>
+</head>
+<body>
+<div id="columnsMenu" title="select columns to show">
+<div><input type="checkbox" checked id="foo"><label for="foo">foo</label></div>
+<div><input type="checkbox" checked id="bar"><label for="bar">bar</label></div>
+<div><input type="checkbox" checked id="baz"><label for="baz">baz</label></div>
+</div>
+<div id="selectColumnsDiv">
+<button id="selectColumns">columns</button>
+</div>
+
+<script src="js/jquery-1.10.2.js"></script>
+<script>
+$(function() {
+  $("#selectColumns").click(function(e) {
+    $("#columnsMenu").show();
+    e.stopPropagation();
+  });
+  $("#columnsMenu").click(function(e) {
+    e.stopPropagation();
+  });
+  $(document).click(function() {
+    $("#columnsMenu").hide();
+  });
+  $("#columnsMenu").on("hidden", function(e) {
+    console.log("hide event", e);
+  });
+});
+</script>
+</body>
+</html>
