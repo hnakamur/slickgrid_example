@@ -340,14 +340,6 @@ $(function () {
     return true;
   }
 
-  $(grid.getHeaderRow()).delegate(":input", "change", function (e) {
-    var columnId = $(this).data("columnId");
-    if (columnId != null) {
-      columnFilters[columnId] = $.trim($(this).val());
-      dataView.refresh();
-    }
-  });
-
   grid.onHeaderRowCellRendered.subscribe(function (e, args) {
     if (args.column.id === "id") return;
     var cell = $(args.node);
@@ -360,6 +352,17 @@ $(function () {
   });
 
   grid.init();
+
+  function updateFilters() {
+    var columnId = $(this).data("columnId");
+    if (columnId != null) {
+      columnFilters[columnId] = $.trim($(this).val());
+      dataView.refresh();
+    }
+  }
+  $(grid.getHeaderRow()).find('input[type=text]').each(function() {
+    $(this).japaneseinputidle(500, updateFilters);
+  });
 
   dataView.onRowCountChanged.subscribe(function (e, args) {
     grid.updateRowCount();
