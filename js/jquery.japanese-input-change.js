@@ -1,35 +1,44 @@
-/*! Japanese input idle plugin for jQuery.
-    https://raw.github.com/hnakamur/jquery-examples/master/js/jquery.japaneseinputidle.js
+/*! Japanese input change plugin for jQuery.
+    https://github.com/hnakamur/jquery.japanese-input-change
     (c) 2014 Hiroaki Nakamura
     MIT License
  */
 (function($, undefined) {
-  $.fn.japaneseinputidle = function(delay, handler) {
-    var el = this,
-        readyToSetTimer = true,
-        isFirefox = navigator.userAgent.indexOf('Firefox') != -1,
-        oldVal,
-        timer;
+  $.fn.japaneseInputChange = function(selector, delay, handler) {
+    var readyToSetTimer = true,
+      isFirefox = navigator.userAgent.indexOf('Firefox') != -1,
+      oldVal,
+      timer,
+      callHandler = function(e) {
+        var $el = $(e.target), val = $el.val();
+        if (val != oldVal) {
+          handler.call($el, e);
+          oldVal = val;
+        }
+      },
+      clearTimer = function() {
+        if (timer !== undefined) {
+          clearTimeout(timer);
+          timer = undefined;
+        }
+      };
 
-    function callHandler(context, e) {
-      val = el.val();
-      if (val != oldVal) {
-        handler.call(context, e);
-        oldVal = val;
-      }
+    if (handler === undefined) {
+      handler = delay;
+      delay = selector;
+      selector = null;
     }
 
-    el.focus(function() {
-      oldVal = el.val();
-    }).blur(function(e) {
-      callHandler(this, e);
-    }).keyup(function(e) {
-      var context = this, val;
-
-      if (timer !== undefined) {
-        clearTimeout(timer);
-        timer = undefined;
-      }
+    return this.on('focus', selector, function(e) {
+      oldVal = $(e.target).val();
+      readyToSetTimer = true;
+    })
+    .on('blur', selector, function(e) {
+      clearTimer();
+      callHandler(e);
+    })
+    .on('keyup', selector, function(e) {
+      clearTimer();
 
       // When Enter is pressed, IME commits text.
       if (e.which == 13 || isFirefox) {
@@ -45,11 +54,12 @@
           // 3. The user presses keys and IME has some uncommitted text.
           //    before timer fires.
           if (readyToSetTimer) {
-            callHandler(context, e);
+            callHandler(e);
           }
         }, delay);
       }
-    }).keydown(function(e) {
+    })
+    .on('keydown', selector, function(e) {
       if (isFirefox) {
         // Firefox fires keydown for the first key, does not fire
         // keydown nor keyup event during IME has uncommitted text, 

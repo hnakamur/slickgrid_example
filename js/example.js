@@ -309,8 +309,6 @@ $(function () {
       .appendTo(cell);
   });
 
-  grid.init();
-
   function updateFilters() {
     var columnId = $(this).data("columnId");
     if (columnId != null) {
@@ -318,9 +316,10 @@ $(function () {
       dataView.refresh();
     }
   }
-  $(grid.getHeaderRow()).find('input[type=text]').each(function() {
-    $(this).japaneseinputidle(500, updateFilters);
-  });
+  $(grid.getHeaderRow()).japaneseInputChange('input[type=text]', 500,
+      updateFilters);
+
+  grid.init();
 
   dataView.onRowCountChanged.subscribe(function (e, args) {
     grid.updateRowCount();
