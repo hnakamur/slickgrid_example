@@ -316,8 +316,7 @@ $(function () {
       dataView.refresh();
     }
   }
-  $(grid.getHeaderRow()).japaneseInputChange('input[type=text]', 500,
-      updateFilters);
+  $(grid.getHeaderRow()).japaneseInputChange('input[type=text]', updateFilters);
 
   grid.init();
 
